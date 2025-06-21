@@ -107,8 +107,15 @@ function update() {
   }
 }
 
+const updateInterval = 500; // milliseconds between generations
+let lastUpdateTime = performance.now();
+
 function animate() {
-  update();
+  const now = performance.now();
+  if (now - lastUpdateTime >= updateInterval) {
+    update();
+    lastUpdateTime = now;
+  }
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
