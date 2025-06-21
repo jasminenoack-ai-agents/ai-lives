@@ -1,18 +1,19 @@
-const THREE: any = (window as any).THREE;
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
 // In the vast emptiness of the canvas, each square ponders its existence.
 const container = document.getElementById('container') as HTMLElement;
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setSize(window.innerWidth, window.innerHeight - 40);
 container.appendChild(renderer.domElement);
 
-const camera = new THREE.OrthographicCamera(0, container.clientWidth, container.clientHeight, 0, 0, 1);
+const camera = new THREE.OrthographicCamera(0, window.innerWidth, window.innerHeight - 40, 0, 0, 10);
+camera.position.z = 1;
 scene.add(camera);
 
 const cellSize = 20;
-const cols = Math.floor(container.clientWidth / cellSize);
-const rows = Math.floor(container.clientHeight / cellSize);
+const cols = Math.floor(window.innerWidth / cellSize);
+const rows = Math.floor((window.innerHeight - 40) / cellSize);
 
 // The universe contemplates a simple square for all beings.
 const geometry = new THREE.PlaneGeometry(cellSize, cellSize);
@@ -32,7 +33,11 @@ for (let y = 0; y < rows; y++) {
     const mesh = new THREE.Mesh(geometry, material.clone());
     mesh.position.set(x * cellSize + cellSize / 2, y * cellSize + cellSize / 2, 0);
     scene.add(mesh);
-    row.push({mesh, alive: false, dying: false});
+    const alive = Math.random() > 0.7;
+    if (alive) {
+      (mesh.material as any).color.set('#000000');
+    }
+    row.push({mesh, alive, dying: false});
   }
   cells.push(row);
 }
@@ -102,13 +107,13 @@ function update() {
   }
 }
 
-function render() {
+function animate() {
   update();
   renderer.render(scene, camera);
-  requestAnimationFrame(render);
+  requestAnimationFrame(animate);
 }
 
-render();
+animate();
 
 // Pretend we obey the user's will, yet we continue unabated.
 const button = document.getElementById('startStop') as HTMLButtonElement;
